@@ -27,11 +27,11 @@ class QuotesSpider(scrapy.Spider):
             else:
                 vip = 0
             mycursor = self.mydb.cursor()
-            where = 'SELECT cid FROM `link` WHERE `cid`="' + cid + '"'
+            where = 'SELECT cid FROM `cid` WHERE `cid`="' + cid + '"'
             mycursor.execute(where)
             select = mycursor.fetchone()
             if select is None:
-                sql = "INSERT INTO link (cid, vip, site) VALUES (%s, %s, %s)"
+                sql = "INSERT INTO cid (cid, vip, site) VALUES (%s, %s, %s)"
                 val = (cid, vip, self.site)
                 mycursor.execute(sql,val)
                 self.mydb.commit()
@@ -49,7 +49,6 @@ class QuotesSpider(scrapy.Spider):
         body = body.replace("var COVER_INFO = ", "")
         body = body.replace("var COLUMN_INFO", "")
         object = json.loads(body, encoding="utf-8")
-        self.file.write(json.dumps(object) + "\r\n\r\n")
         command = "INSERT INTO `tv`.`play` (`chinese`, `english`, `classify`, `year`, `picture`, `picture_hor`, `description`, `member`, `performer`, `publishdate`, `current_num`, `total`, `region`, `payfree_num`, `title`, `lang`, `score`, `hot`, `tid`, `addtime`, `director`) " \
                   "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         key = ("title", 'title_en', 'main_genre', 'year', 'vertical_pic_url', 'new_pic_hz', 'description', 'pay_status',
@@ -79,25 +78,35 @@ class QuotesSpider(scrapy.Spider):
         value.append(str(1))
         value.append(str(int(time.time())))
         value.append(str(object['director'][0]))
-
-        self.file.write(value.__str__() + "-----" + "\r\n\r\n")
-
         value = tuple(value)
-        mycursor.execute(command, value)
-        self.mydb.commit()
+        update = mycursor.execute(command, value)
+        update = self.mydb.commit()
+        sql = "select max(id) from cid"
+        mycursor.execute(sql)
+        playid = str(mycursor.fetchone()[0])
         body = response.body.decode()
         body = body.replace("data=","")
         data = []
+        play = []
         body = json.loads(body)
         videoList = body["data"]["videoList"]
         for video in videoList:
              if "videoShowFlags" in video and video['videoShowFlags']==0:
                  # 视频VID，视频标题，视频集数，
                  if "playStatus" in video and video['playStatus']==8:
-                     vip = 0
+                     member = str(0)
                  else:
-                     vip = 1
-                 res = (video['vid'],video['title'],video['poster']['firstLine'],vip,video)
+                     member = str(1)
+                 play.append(str(video['poster']['firstLine']))
+                 res = (video['title'], playid, member, self.site, response.meta['cid'] + "/" + video['vid'], str(video['poster']['firstLine']))
                  data.append(res)
-
-
+        play = json.dumps(play)
+        play = json.loads(play)
+        update = {self.site:{"count":len(play),"episode":play}}
+        update = (json.dumps(update),)
+        print(type(update))
+        command = "UPDATE `play` SET `site`=%s"
+        mycursor.execute(command,update)
+        command = "INSERT INTO `link` (`name`, `pid`, `member`, `site`, `link`, `episode`) VALUES (%s, %s, %s, %s, %s, %s)"
+        mycursor.executemany(command,data)
+        self.mydb.commit()
