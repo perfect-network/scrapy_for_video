@@ -1,0 +1,1 @@
+tt = open("../text.txt","r+")

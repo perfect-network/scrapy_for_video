@@ -1,0 +1,53 @@
+2018-12-09 22:33:26 [scrapy.utils.log] INFO: Scrapy 1.5.0 started (bot: tv20181209)
+2018-12-09 22:33:26 [scrapy.utils.log] INFO: Versions: lxml 4.2.5.0, libxml2 2.9.5, cssselect 1.0.3, parsel 1.5.1, w3lib 1.19.0, Twisted 18.9.0, Python 3.7.1 (v3.7.1:260ec2c36a, Oct 20 2018, 14:05:16) [MSC v.1915 32 bit (Intel)], pyOpenSSL 18.0.0 (OpenSSL 1.1.0j  20 Nov 2018), cryptography 2.4.2, Platform Windows-10-10.0.17134-SP0
+2018-12-09 22:33:26 [scrapy.crawler] INFO: Overridden settings: {'BOT_NAME': 'tv20181209', 'LOG_FILE': 'all.log', 'NEWSPIDER_MODULE': 'tv20181209.spiders', 'ROBOTSTXT_OBEY': True, 'SPIDER_MODULES': ['tv20181209.spiders']}
+2018-12-09 22:33:27 [scrapy.middleware] INFO: Enabled extensions:
+['scrapy.extensions.corestats.CoreStats',
+ 'scrapy.extensions.telnet.TelnetConsole',
+ 'scrapy.extensions.logstats.LogStats']
+2018-12-09 22:33:27 [scrapy.middleware] INFO: Enabled downloader middlewares:
+['scrapy.downloadermiddlewares.robotstxt.RobotsTxtMiddleware',
+ 'scrapy.downloadermiddlewares.httpauth.HttpAuthMiddleware',
+ 'scrapy.downloadermiddlewares.downloadtimeout.DownloadTimeoutMiddleware',
+ 'scrapy.downloadermiddlewares.defaultheaders.DefaultHeadersMiddleware',
+ 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware',
+ 'scrapy.downloadermiddlewares.retry.RetryMiddleware',
+ 'scrapy.downloadermiddlewares.redirect.MetaRefreshMiddleware',
+ 'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware',
+ 'scrapy.downloadermiddlewares.redirect.RedirectMiddleware',
+ 'scrapy.downloadermiddlewares.cookies.CookiesMiddleware',
+ 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware',
+ 'scrapy.downloadermiddlewares.stats.DownloaderStats']
+2018-12-09 22:33:27 [scrapy.middleware] INFO: Enabled spider middlewares:
+['scrapy.spidermiddlewares.httperror.HttpErrorMiddleware',
+ 'scrapy.spidermiddlewares.offsite.OffsiteMiddleware',
+ 'scrapy.spidermiddlewares.referer.RefererMiddleware',
+ 'scrapy.spidermiddlewares.urllength.UrlLengthMiddleware',
+ 'scrapy.spidermiddlewares.depth.DepthMiddleware']
+2018-12-09 22:33:27 [scrapy.middleware] INFO: Enabled item pipelines:
+[]
+2018-12-09 22:33:27 [scrapy.core.engine] INFO: Spider opened
+2018-12-09 22:33:27 [scrapy.extensions.logstats] INFO: Crawled 0 pages (at 0 pages/min), scraped 0 items (at 0 items/min)
+2018-12-09 22:33:27 [scrapy.extensions.telnet] DEBUG: Telnet console listening on 127.0.0.1:6023
+2018-12-09 22:33:28 [scrapy.core.engine] DEBUG: Crawled (200) <GET http://v.qq.com/robots.txt> (referer: None)
+2018-12-09 22:33:28 [scrapy.core.engine] DEBUG: Crawled (200) <GET http://v.qq.com/x/list/tv?offset=0&sort=19> (referer: None)
+2018-12-09 22:33:28 [quotes] DEBUG: ['<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">', '<meta name="renderer" content="webkit">', '<meta http-equiv="content-type" content="text/html;charset=utf-8">', '<meta name="keywords" content="电视剧视频, 电视剧视频排行榜, 最新高清电视剧视频, 电视剧排行榜, 腾讯视频, 视频分享, 视频搜索, 视频播放,电视剧视频在线观看">', '<meta name="description" content="腾讯视频是国内更新电视剧最快,收录电视剧,视频资源最全的网站,腾讯视频电视剧频道提供全新热门电视剧免费观看,海量高清正版电视剧在线观看,同步更新全国视频网站热映大片,包括欧美大片,日韩电视剧,华语电视剧等">']
+2018-12-09 22:33:28 [scrapy.core.engine] INFO: Closing spider (finished)
+2018-12-09 22:33:28 [scrapy.statscollectors] INFO: Dumping Scrapy stats:
+{'downloader/request_bytes': 450,
+ 'downloader/request_count': 2,
+ 'downloader/request_method_count/GET': 2,
+ 'downloader/response_bytes': 33635,
+ 'downloader/response_count': 2,
+ 'downloader/response_status_count/200': 2,
+ 'finish_reason': 'finished',
+ 'finish_time': datetime.datetime(2018, 12, 9, 14, 33, 28, 498074),
+ 'log_count/DEBUG': 4,
+ 'log_count/INFO': 7,
+ 'response_received_count': 2,
+ 'scheduler/dequeued': 1,
+ 'scheduler/dequeued/memory': 1,
+ 'scheduler/enqueued': 1,
+ 'scheduler/enqueued/memory': 1,
+ 'start_time': datetime.datetime(2018, 12, 9, 14, 33, 27, 935583)}
+2018-12-09 22:33:28 [scrapy.core.engine] INFO: Spider closed (finished)
