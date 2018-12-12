@@ -15,3 +15,15 @@
 | **优酷视频** | <https://www.youku.com/>   |✖|✖|✖|
 | **芒果TV**   | <https://www.mgtv.com/>    |✖|✖|✖|
 | **PPTV**     |  <http://www.pptv.com/>    |✖|✖|✖|
+| **乐视TV**   | <http://www.le.com/>       |✖|✖|✖|
+| **搜狐视频** | <https://tv.sohu.com/>     |✖|✖|✖|
+| **咪咕视频** | <http://www.miguvideo.com> |✖|✖|✖|
+| **华数TV**   | <https://www.wasu.cn/>     |✖|✖|✖|
+| **风行TV**   |  <http://www.fun.tv/>      |✖|✖|✖|
+| **暴风视频** |  <http://www.baofeng.com/> |✖|✖|✖|
+| **BiliBili** | <https://www.bilibili.com/>|✖|✖|✖|
+| **CCTV**     | <http://www.cctv.com/>     |✖|✖|✖|
+| **看看视频**  | <http://www.kankan.com/>   |✖|✖|✖|
+| **1905视频**  | <http://www.1905.com/>     |✖|✖|✖|
+
+
