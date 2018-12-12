@@ -5,10 +5,10 @@
     
 将要爬取的站点
 -------------------------------
-| Site | URL | Videos? | Images? | Audios? |
-| :--: | :--: | :-----: | :-----: | :-----: |
-| **YouTube** | <https://www.youtube.com/>    |✓| | |
-| **Twitter** | <https://twitter.com/>        |✓|✓| |
+| 站点 | 链接 | 视频信息 |
+| :--: | :-- | :-----: | :-----: | :-----: |
+| **腾讯视频** | <https://www.youtube.com/>    |✓|
+| **爱奇艺** | <https://twitter.com/>        |✓|
 
 - 腾讯视频
 - 爱奇艺
