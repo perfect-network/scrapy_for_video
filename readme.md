@@ -7,5 +7,8 @@
 -------------------------------
 | 站点 | 链接 | 视频信息 |
 | :--: | :-- | :-----: |
-| **腾讯视频** | <https://www.youtube.com/>  |✓|
-| **爱奇艺** | <https://twitter.com/>        |✓|
+| **腾讯视频** | <http://v.qq.com>          |✖|
+| **爱奇艺**   | <http://iqiyi.com>         |✖|
+| **优酷视频** | <https://www.youku.com/>   |✖|
+| **芒果TV**   | <https://www.mgtv.com/>    |✖|
+| **PPTV**     |  <http://www.pptv.com/>    |✖|
