@@ -5,6 +5,11 @@
     
 将要爬取的站点
 -------------------------------
+| Site | URL | Videos? | Images? | Audios? |
+| :--: | :-- | :-----: | :-----: | :-----: |
+| **YouTube** | <https://www.youtube.com/>    |✓| | |
+| **Twitter** | <https://twitter.com/>        |✓|✓| |
+
 - 腾讯视频
 - 爱奇艺
 - 优酷视频
