@@ -12,6 +12,7 @@ NEWSPIDER_MODULE = 'tv20181209.spiders'
 ROBOTSTXT_OBEY = True
 today = datetime.datetime.now()
 LOG_LEVEL= 'INFO'
+LOG_FILE="log.txt"
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
 

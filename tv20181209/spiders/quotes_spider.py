@@ -49,8 +49,8 @@ class QuotesSpider(scrapy.Spider):
         body = body.replace("var COVER_INFO = ", "")
         body = body.replace("var COLUMN_INFO", "")
         object = json.loads(body, encoding="utf-8")
-        command = "INSERT INTO `tv`.`play` (`chinese`, `english`, `classify`, `year`, `picture`, `picture_hor`, `description`, `member`, `performer`, `publishdate`, `current_num`, `total`, `region`, `payfree_num`, `title`, `lang`, `score`, `hot`, `tid`, `addtime`, `director`) " \
-                  "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        command = "INSERT INTO `tv`.`play` (`chinese`, `english`, `classify`, `year`, `picture`, `picture_hor`, `description`, `member`, `performer`, `publishdate`, `current_num`, `total`, `region`, `payfree_num`, `title`, `lang`, `score`, `hot`, `tid`, `addtime`, `director`, `finish`) " \
+                  "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         key = ("title", 'title_en', 'main_genre', 'year', 'vertical_pic_url', 'new_pic_hz', 'description', 'pay_status',
                'leading_actor', 'publish_date', 'current_num', 'episode_all', 'area_name', 'payfree_num',
                'second_title',
@@ -78,6 +78,11 @@ class QuotesSpider(scrapy.Spider):
         value.append(str(1))
         value.append(str(int(time.time())))
         value.append(str(object['director'][0]))
+        if str(object['current_num'])==str(object['episode_all']):
+            value.append(str(1))
+        else:
+            value.append(str(0))
+
         value = tuple(value)
         update = mycursor.execute(command, value)
         update = self.mydb.commit()
@@ -98,13 +103,13 @@ class QuotesSpider(scrapy.Spider):
                  else:
                      member = str(1)
                  play.append(str(video['poster']['firstLine']))
+                 play.append({"episode":str(video['poster']['firstLine']),"member":member})
                  res = (video['title'], playid, member, self.site, response.meta['cid'] + "/" + video['vid'], str(video['poster']['firstLine']))
                  data.append(res)
         play = json.dumps(play)
         play = json.loads(play)
         update = {self.site:{"count":len(play),"episode":play}}
         update = (json.dumps(update),)
-        print(type(update))
         command = "UPDATE `play` SET `site`=%s"
         mycursor.execute(command,update)
         command = "INSERT INTO `link` (`name`, `pid`, `member`, `site`, `link`, `episode`) VALUES (%s, %s, %s, %s, %s, %s)"

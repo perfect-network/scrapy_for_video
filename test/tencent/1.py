@@ -69,6 +69,4 @@ value.append(str(1))
 value.append(str(int(time.time())))
 value.append(object['director'][0])
 bb = tuple(value)
-for b in bb:
-    print(type(b))
-    print(b)
+print(bb)
