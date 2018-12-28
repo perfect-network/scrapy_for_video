@@ -10,9 +10,14 @@
 ----------------------------------------
     有任何问题皆可加QQ群交流，或询问群主，我希望同各位一起学习，交流，公共完善这个项目。
    
-执行程序(环境完整的情况下)
+使用说明
 ----------------------------------------
-    腾讯视频：scrapy crawl qq
+    git clone https://github.com/perfect-network/scrapy_for_video.git
+    cd scrapy_for_video
+    修改tv20181209/spiders/qq_spider.py 中的mysql信息
+    再将mysql.sql导入到数据库
+    然后保证已经将scrapy, math, json, requests, mysql-connector(若安装失败请百度，或私聊), time 这些库导入即可。。
+    scrapy crawl qq #执行腾讯视频的爬虫
  
     
 将要爬取的站点
