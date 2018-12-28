@@ -93,104 +93,108 @@ class QuotesSpider(scrapy.Spider):
         tid = response.meta['tid']
         body = response.body.decode().replace("data=", "")  # 请求结果，并替换掉其中的多余字符
         data = json.loads(body)  # 序列化，转为dict
-        cid = data['data']['cid']
-        info = {}  # 定义一个dict类型的变量，将用于存储信息，将传递到下一步，结合下一步获得的信息得到完整的信息
-        other = {}  # 储存另外一些信息（非play表的信息）
-        introduct = data['data']['introductionMap'][cid]
-        detailInfo = {}  # 用于临时存放部分信息
-        for item in introduct['detailInfo']:
-            if len(item['itemValue']) != 0:
-                detailInfo[item['itemId']] = item['itemValue'].replace("更新至", "").replace("集", "").replace("全", "")
-            else:
-                detailInfo[item['itemId']] = item['itemValues']
-        if "total" in detailInfo:
-            if not "update" in detailInfo:
-                detailInfo['update'] = detailInfo['total']
-        if "update" in detailInfo and "total" in detailInfo:
-            if int(detailInfo['update']) == int(detailInfo['total']):
-                info['finish'] = "1"
-            else:
-                info['finish'] = "0"
-        if "year" in detailInfo:
-            info['year'] = detailInfo['year']
-        if data['data']['defaultVideoDataKey'] in data['data']['videoDataMap']:
-            videolist = data['data']['videoDataMap'][data['data']['defaultVideoDataKey']]['videoList']
-            for video in videolist:
-                info['picture_hor'] = video['shareItem']['shareImgUrl']
-                break
-        performer = []
-        for actor in introduct['actorInfo']:
-            if actor['title'] == "导 演：":
-                for res in actor['actorInfoList']:
+        if "data" in data:
+            cid = data['data']['cid']
+            info = {}  # 定义一个dict类型的变量，将用于存储信息，将传递到下一步，结合下一步获得的信息得到完整的信息
+            other = {}  # 储存另外一些信息（非play表的信息）
+            introduct = data['data']['introductionMap'][cid]
+            detailInfo = {}  # 用于临时存放部分信息
+            for item in introduct['detailInfo']:
+                if len(item['itemValue']) != 0:
+                    if item['itemId']=="total":
+                        detailInfo['total1'] = item['itemValue']
+                    detailInfo[item['itemId']] = item['itemValue'].replace("更新至", "").replace("集", "").replace("全", "").replace("更新时", "").replace("第", "")
+                else:
+                    detailInfo[item['itemId']] = item['itemValues']
+            if "total" in detailInfo:
+                if not "update" in detailInfo or detailInfo['total1'].find("全"):
+                    detailInfo['update'] = detailInfo['total']
+            if "update" in detailInfo and "total" in detailInfo:
+                self.file.write(detailInfo['update'] + "  " + detailInfo['total'] + "  " + cid)
+                if int(detailInfo['update']) == int(detailInfo['total']):
+                    info['finish'] = "1"
+                else:
+                    info['finish'] = "0"
+            if "year" in detailInfo:
+                info['year'] = detailInfo['year']
+            if data['data']['defaultVideoDataKey'] in data['data']['videoDataMap']:
+                videolist = data['data']['videoDataMap'][data['data']['defaultVideoDataKey']]['videoList']
+                for video in videolist:
+                    info['picture_hor'] = video['shareItem']['shareImgUrl']
+                    break
+            performer = []
+            for actor in introduct['actorInfo']:
+                if actor['title'] == "导 演：":
+                    for res in actor['actorInfoList']:
+                        if len(res['actorName']) != 0:
+                            info['director'] = res['actorName']
+                        elif len(res['actorId']) != 0:
+                            info['director'] = res['actorId']
+            if "intro" in data['data']['actorDataMap']:
+                for res in data['data']['actorDataMap']['intro']['actorInfoList']:
                     if len(res['actorName']) != 0:
-                        info['director'] = res['actorName']
+                        performer.append(res['actorName'])
                     elif len(res['actorId']) != 0:
-                        info['director'] = res['actorId']
-        if "intro" in data['data']['actorDataMap']:
-            for res in data['data']['actorDataMap']['intro']['actorInfoList']:
-                if len(res['actorName']) != 0:
-                    performer.append(res['actorName'])
-                elif len(res['actorId']) != 0:
-                    performer.append(res['actorId'])
+                        performer.append(res['actorId'])
 
-        other['performer'] = performer
-        other['type'] = detailInfo['type']
-        if 'poster' in introduct and 'firstLine' in introduct['poster']:
-            info['chinese'] = introduct['poster']['firstLine']
-        if 'text' in introduct:
-            info['description'] = introduct['text']
-        if 'poster' in introduct and 'imageUrl' in introduct['poster']:
-            info['picture'] = introduct['poster']['imageUrl']
-        if 'area' in detailInfo:
-            info['region'] = detailInfo['area']
-        if "update" in detailInfo and "total" in detailInfo:
-            info['current_num'] = detailInfo['update']
-            info['total'] = detailInfo['total']
-        if 'poster' in introduct and 'rating' in introduct['poster']:
-            info['score'] = round(introduct['poster']['rating'] / 10, 1)
-        info['addtime'] = round(time.time())
-        info['tid'] = tid
-        #------------------第二-------------------
-        episode = []
-        lastid = ""
-        thisid = "x"
-        link = []
-        links = {}
-        while lastid != thisid:
-            thisid = lastid
-            if thisid:
-                vid = "vid=" + thisid
-            else:
-                vid = ""
-            data = {'dataKey': "req_type=2&lid=&cid=" + cid + "&vid=&ui=0", 'pageContext': vid}
-            data = json.dumps(data)
-            rep = requests.post(
-                url="http://access.video.qq.com/tinyapp/detail_video_list?vappid=65939066&vsecret=07c58e0c93150c4254a2a24131574b94cab6142ba4210efa&vversion_name=5.2.0.1234&vplatform=3",
-                data=data)
-            body = rep.content.decode().replace("data=", "")  # 请求结果，并替换掉其中的多余字符
-            data = json.loads(body)  # 序列化，转为dict
-            for res in data['data']['videoList']:
-                if not res['isTrailor'] and not res['poster']['firstLine'] in links:  # 过滤掉预告与已经存在的视频
-                    if int(res['payStatus']) == 8:
-                        member = 0
-                    else:
-                        member = 1
-                    episode.append({"episode": res['poster']['firstLine'], "member": member})
-                    links[res['poster']['firstLine']] = "1"
-                    link.append({
-                        "episode": res['poster']['firstLine'],
-                        "member": member,
-                        'image': res['poster']['imageUrl'],
-                        'name': res['title'],
-                        'start': res['skipStart'],
-                        'end': res['skipEnd'],
-                        'site': "qq",
-                        'link': cid + "/" + res['vid']
-                    })
-                lastid = res['vid']
-        info['site'] = {}
-        info['site']['qq'] = episode
-        self.info2({"info":info,"other":other,"link":link,"cid":cid})
+            other['performer'] = performer
+            other['type'] = detailInfo['type']
+            if 'poster' in introduct and 'firstLine' in introduct['poster']:
+                info['chinese'] = introduct['poster']['firstLine']
+            if 'text' in introduct:
+                info['description'] = introduct['text']
+            if 'poster' in introduct and 'imageUrl' in introduct['poster']:
+                info['picture'] = introduct['poster']['imageUrl']
+            if 'area' in detailInfo:
+                info['region'] = detailInfo['area']
+            if "update" in detailInfo and "total" in detailInfo:
+                info['current_num'] = detailInfo['update']
+                info['total'] = detailInfo['total']
+            if 'poster' in introduct and 'rating' in introduct['poster']:
+                info['score'] = round(introduct['poster']['rating'] / 10, 1)
+            info['addtime'] = round(time.time())
+            info['tid'] = tid
+            #------------------第二-------------------
+            episode = []
+            lastid = ""
+            thisid = "x"
+            link = []
+            links = {}
+            while lastid != thisid:
+                thisid = lastid
+                if thisid:
+                    vid = "vid=" + thisid
+                else:
+                    vid = ""
+                data = {'dataKey': "req_type=2&lid=&cid=" + cid + "&vid=&ui=0", 'pageContext': vid}
+                data = json.dumps(data)
+                rep = requests.post(
+                    url="http://access.video.qq.com/tinyapp/detail_video_list?vappid=65939066&vsecret=07c58e0c93150c4254a2a24131574b94cab6142ba4210efa&vversion_name=5.2.0.1234&vplatform=3",
+                    data=data)
+                body = rep.content.decode().replace("data=", "")  # 请求结果，并替换掉其中的多余字符
+                data = json.loads(body)  # 序列化，转为dict
+                for res in data['data']['videoList']:
+                    if not res['isTrailor'] and not res['poster']['firstLine'] in links:  # 过滤掉预告与已经存在的视频
+                        if int(res['payStatus']) == 8:
+                            member = 0
+                        else:
+                            member = 1
+                        episode.append({"episode": res['poster']['firstLine'], "member": member})
+                        links[res['poster']['firstLine']] = "1"
+                        link.append({
+                            "episode": res['poster']['firstLine'],
+                            "member": member,
+                            'image': res['poster']['imageUrl'],
+                            'name': res['title'],
+                            'start': res['skipStart'],
+                            'end': res['skipEnd'],
+                            'site': "qq",
+                            'link': cid + "/" + res['vid']
+                        })
+                    lastid = res['vid']
+            info['site'] = {}
+            info['site']['qq'] = episode
+            self.info2({"info":info,"other":other,"link":link,"cid":cid})
 
     def info2(self,response):
         state = 0
@@ -216,10 +220,9 @@ class QuotesSpider(scrapy.Spider):
             else:
                 data.append(str(value))
         db = self.mydb.cursor()
-        command = "SELECT * FROM  `play` WHERE  `chinese` LIKE  '" + response['info'][
-            'chinese'] + "' AND  `tid` =" + str(response['info']['tid'])
+        command = "SELECT * FROM  `play` WHERE  `chinese` LIKE  '" + response['info']['chinese'] + "' AND  `tid` =" + str(response['info']['tid'])
         db.execute(command)
-        if not db.fetchone():
+        if not db.fetchone() and len(response['link'])!=0:
             # -------------------增加此影片基本信息----------------------
             command = "INSERT INTO `tv`.`play` (" + sql1 + ") VALUES (" + sql2 + ")"
             db.execute(command, data)
@@ -277,11 +280,12 @@ class QuotesSpider(scrapy.Spider):
                 db.executemany(command, performer_data)
                 self.mydb.commit()
             if state==1:
-                print("入库成功",response['cid'])
+                self.num = self.num + 1
+                arr = ["电影","电视剧","综艺","动漫","少儿","纪录片","微电影"]
+                print(self.num,"入库成功",arr[int(info['tid'])],info['chinese'],"一共有"+ str(len(response['link'])) + "条视频",response['cid'])
             else:
                 print("入库失败",response['cid'])
-        else:
-            print("已存在")
+
 
 
 
