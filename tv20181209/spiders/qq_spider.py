@@ -83,17 +83,21 @@ class QuotesSpider(scrapy.Spider):
     def info(self, response):
         items = response.css(".list_item")
         url = "http://access.video.qq.com/tinyapp/video_detail?vappid=65939066&vsecret=07c58e0c93150c4254a2a24131574b94cab6142ba4210efa&vversion_name=5.2.0.1234&vplatform=3"
-        for item in items:
-            cid = item.css("li::attr(__wind)").extract()[0].replace("cid=", "")
-            data = {'cid': cid}
-            data = json.dumps(data)
-            yield scrapy.Request(url=url,method="POST",body=data,callback=self.info1,meta=response.meta)
+        if len(items)!=0:
+            for item in items:
+                cid = item.css("li::attr(__wind)").extract()[0].replace("cid=", "")
+                data = {'cid': cid}
+                db = self.mydb.cursor()
+                db.execute("INSERT INTO `tv`.`cid` (`cid`) VALUES ('" + cid + "');")
+                self.mydb.commit()
+                data = json.dumps(data)
+                yield scrapy.Request(url=url,method="POST",body=data,callback=self.info1,meta={"tid":response.meta['tid'],"cid":cid})
 
     def info1(self,response):
         tid = response.meta['tid']
         body = response.body.decode().replace("data=", "")  # 请求结果，并替换掉其中的多余字符
         data = json.loads(body)  # 序列化，转为dict
-        if "data" in data:
+        if type(data)==type({}) and "data" in data: # 如果没有请求到正确的数据
             cid = data['data']['cid']
             info = {}  # 定义一个dict类型的变量，将用于存储信息，将传递到下一步，结合下一步获得的信息得到完整的信息
             other = {}  # 储存另外一些信息（非play表的信息）
@@ -280,9 +284,11 @@ class QuotesSpider(scrapy.Spider):
                 db.executemany(command, performer_data)
                 self.mydb.commit()
             if state==1:
+                db.execute("UPDATE  `tv`.`cid` SET  `status` =  '1' WHERE  `cid` = '"+ response['cid'] +"';")
+                self.mydb.commit()
                 self.num = self.num + 1
                 arr = ["电影","电视剧","综艺","动漫","少儿","纪录片","微电影"]
-                print(self.num,"入库成功",arr[int(info['tid'])],info['chinese'],"一共有"+ str(len(response['link'])) + "条视频",response['cid'])
+                print(self.num,"入库成功",arr[int(info['tid']-1)],info['chinese'],"一共有"+ str(len(response['link'])) + "条视频",response['cid'])
             else:
                 print("入库失败",response['cid'])
 

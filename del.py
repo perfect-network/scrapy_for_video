@@ -15,6 +15,8 @@ def delete():
     mydb.commit()
     c.execute("DELETE FROM `classify` WHERE 1")
     mydb.commit()
+    c.execute("DELETE FROM `cid` WHERE 1")
+    mydb.commit()
     print("删除成功")
 
 def insert():
