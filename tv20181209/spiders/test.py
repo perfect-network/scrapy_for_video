@@ -1,14 +1,13 @@
-import scrapy,json
+import scrapy,json,sys
 
 
 class QuotesSpider(scrapy.Spider):
     name = "test"
-
     def start_requests(self):
-        url = "http://122.114.214.21/python/bin.php"
-        yield scrapy.Request(url=url, callback=self.parse,method="POST",body="xxxxxxxxxxxx")
+        url = "http://v.qq.com/x/list/tv?offset=0&sort=19"
+        yield scrapy.Request(url=url, callback=self.parse)
 
     def parse(self, response):
-        file = open("text.txt","r+")
-        for res in response.body:
-            file.write(str(res))
+        count = response.css("em.hl::text").extract_first()
+        print(response.url)
+

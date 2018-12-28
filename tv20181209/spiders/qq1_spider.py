@@ -2,8 +2,7 @@ import scrapy, json, mysql.connector, re, requests, time
 
 
 class QuotesSpider(scrapy.Spider):
-    site = "qq"
-    name = "quotes"
+    name = "qq1"
 
     def __init__(self):
         self.file = open("text.txt", "w")
@@ -32,7 +31,7 @@ class QuotesSpider(scrapy.Spider):
             select = mycursor.fetchone()
             if select is None:
                 sql = "INSERT INTO cid (cid, vip, site) VALUES (%s, %s, %s)"
-                val = (cid, vip, self.site)
+                val = (cid, vip, self.name)
                 mycursor.execute(sql,val)
                 self.mydb.commit()
                 body = {'dataKey' :"req_type=2&lid=&cid="+cid+ "&vid=&ui=0", 'pageContext' :""}
@@ -104,11 +103,11 @@ class QuotesSpider(scrapy.Spider):
                      member = str(1)
                  play.append(str(video['poster']['firstLine']))
                  play.append({"episode":str(video['poster']['firstLine']),"member":member})
-                 res = (video['title'], playid, member, self.site, response.meta['cid'] + "/" + video['vid'], str(video['poster']['firstLine']))
+                 res = (video['title'], playid, member, self.name, response.meta['cid'] + "/" + video['vid'], str(video['poster']['firstLine']))
                  data.append(res)
         play = json.dumps(play)
         play = json.loads(play)
-        update = {self.site:{"count":len(play),"episode":play}}
+        update = {self.name:{"count":len(play),"episode":play}}
         update = (json.dumps(update),)
         command = "UPDATE `play` SET `site`=%s"
         mycursor.execute(command,update)

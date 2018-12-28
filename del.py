@@ -7,11 +7,13 @@ mydb = mysql.connector.connect(
         )
 def delete():
     c = mydb.cursor()
-    c.execute("DELETE FROM `cid` WHERE 1")
-    mydb.commit()
     c.execute("DELETE FROM `play` WHERE 1")
     mydb.commit()
     c.execute("DELETE FROM `link` WHERE 1")
+    mydb.commit()
+    c.execute("DELETE FROM `performer` WHERE 1")
+    mydb.commit()
+    c.execute("DELETE FROM `classify` WHERE 1")
     mydb.commit()
     print("删除成功")
 
@@ -34,3 +36,5 @@ elif data[1]=="insert":
     insert()
 elif data[1]=="max":
     max()
+else:
+    delete()
