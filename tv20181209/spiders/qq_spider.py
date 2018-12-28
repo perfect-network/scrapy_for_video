@@ -113,10 +113,11 @@ class QuotesSpider(scrapy.Spider):
                 info['finish'] = "0"
         if "year" in detailInfo:
             info['year'] = detailInfo['year']
-        videolist = data['data']['videoDataMap'][data['data']['defaultVideoDataKey']]['videoList']
-        for video in videolist:
-            info['picture_hor'] = video['shareItem']['shareImgUrl']
-            break
+        if data['data']['defaultVideoDataKey'] in data['data']['videoDataMap']:
+            videolist = data['data']['videoDataMap'][data['data']['defaultVideoDataKey']]['videoList']
+            for video in videolist:
+                info['picture_hor'] = video['shareItem']['shareImgUrl']
+                break
         performer = []
         for actor in introduct['actorInfo']:
             if actor['title'] == "导 演：":
@@ -134,14 +135,19 @@ class QuotesSpider(scrapy.Spider):
 
         other['performer'] = performer
         other['type'] = detailInfo['type']
-        info['chinese'] = introduct['poster']['firstLine']
-        info['description'] = introduct['text']
-        info['picture'] = introduct['poster']['imageUrl']
-        info['region'] = detailInfo['area']
+        if 'poster' in introduct and 'firstLine' in introduct['poster']:
+            info['chinese'] = introduct['poster']['firstLine']
+        if 'text' in introduct:
+            info['description'] = introduct['text']
+        if 'poster' in introduct and 'imageUrl' in introduct['poster']:
+            info['picture'] = introduct['poster']['imageUrl']
+        if 'area' in detailInfo:
+            info['region'] = detailInfo['area']
         if "update" in detailInfo and "total" in detailInfo:
             info['current_num'] = detailInfo['update']
             info['total'] = detailInfo['total']
-        info['score'] = round(introduct['poster']['rating'] / 10, 1)
+        if 'poster' in introduct and 'rating' in introduct['poster']:
+            info['score'] = round(introduct['poster']['rating'] / 10, 1)
         info['addtime'] = round(time.time())
         info['tid'] = tid
         #------------------第二-------------------
