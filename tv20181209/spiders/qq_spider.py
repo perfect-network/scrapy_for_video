@@ -1,4 +1,4 @@
-import scrapy, math, json, requests, mysql.connector, time
+import scrapy, math, json, requests, mysql.connector, time ,sys
 
 
 class QuotesSpider(scrapy.Spider):
@@ -9,6 +9,7 @@ class QuotesSpider(scrapy.Spider):
         self.file = open("temp.txt", "w")
         self.status = 0
         self.num = 0
+        self.error = 0
         self.mydb = mysql.connector.connect(
             host="localhost",
             user="root",
@@ -88,8 +89,10 @@ class QuotesSpider(scrapy.Spider):
                 cid = item.css("li::attr(__wind)").extract()[0].replace("cid=", "")
                 data = {'cid': cid}
                 db = self.mydb.cursor()
-                db.execute("INSERT INTO `tv`.`cid` (`cid`) VALUES ('" + cid + "');")
-                self.mydb.commit()
+                db.execute("SELECT * FROM  `tv`.`cid` WHERE `cid`='" + cid +"'")
+                if not db.fetchone():
+                    db.execute("INSERT INTO `tv`.`cid` (`cid`,`tid`) VALUES ('" + cid + "','" + str(response.meta['tid']) + "');")
+                    self.mydb.commit()
                 data = json.dumps(data)
                 yield scrapy.Request(url=url,method="POST",body=data,callback=self.info1,meta={"tid":response.meta['tid'],"cid":cid})
 
@@ -226,6 +229,8 @@ class QuotesSpider(scrapy.Spider):
         db = self.mydb.cursor()
         command = "SELECT * FROM  `play` WHERE  `chinese` LIKE  '" + response['info']['chinese'] + "' AND  `tid` =" + str(response['info']['tid'])
         db.execute(command)
+        arr = ["电影", "电视剧", "综艺", "动漫", "少儿", "纪录片", "微电影"]
+
         if not db.fetchone() and len(response['link'])!=0:
             # -------------------增加此影片基本信息----------------------
             command = "INSERT INTO `tv`.`play` (" + sql1 + ") VALUES (" + sql2 + ")"
@@ -287,10 +292,15 @@ class QuotesSpider(scrapy.Spider):
                 db.execute("UPDATE  `tv`.`cid` SET  `status` =  '1' WHERE  `cid` = '"+ response['cid'] +"';")
                 self.mydb.commit()
                 self.num = self.num + 1
-                arr = ["电影","电视剧","综艺","动漫","少儿","纪录片","微电影"]
                 print(self.num,"入库成功",arr[int(info['tid']-1)],info['chinese'],"一共有"+ str(len(response['link'])) + "条视频",response['cid'])
             else:
                 print("入库失败",response['cid'])
+        else:
+            db.execute("UPDATE  `tv`.`cid` SET  `status` =  '1' WHERE  `cid` = '" + response['cid'] + "';")
+            self.mydb.commit()
+            self.error = self.error + 1
+            print(self.error, "入库失败", arr[int(info['tid'] - 1)], info['chinese'],"一共有" + str(len(response['link'])) + "条视频", response['cid'],"已存在")
+
 
 
 
